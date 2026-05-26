@@ -1,0 +1,63 @@
+{
+  "compilerOptions": {
+    /* =========================================
+       Language & Environment
+    ========================================= */
+    "target": "ESNext",
+    "lib": ["ESNext"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+
+    /* =========================================
+       Strictness
+    ========================================= */
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+
+    /* =========================================
+       Project Structure
+    ========================================= */
+    "outDir": "./dist",
+
+    /* =========================================
+       Aliases
+    ========================================= */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+
+    /* =========================================
+       Interop
+    ========================================= */
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+
+    /* =========================================
+       Build & Tooling
+    ========================================= */
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    "skipLibCheck": true,
+
+    /* =========================================
+       DX
+    ========================================= */
+    "sourceMap": true,
+
+    /* =========================================
+       Types
+    ========================================= */
+    "types": ["node"]
+  },
+
+  "include": ["src", "prisma.config.ts"],
+  "exclude": ["node_modules", "dist"]
+}

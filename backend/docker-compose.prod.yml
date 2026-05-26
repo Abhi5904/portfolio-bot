@@ -1,0 +1,8 @@
+services:
+  api:
+    command: node dist/server.js
+    ports:
+      - "8000:8000"
+
+  worker:
+    command: node dist/queues/worker.js

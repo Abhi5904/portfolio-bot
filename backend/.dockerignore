@@ -1,0 +1,45 @@
+# dependencies
+node_modules
+npm-debug.log
+yarn-error.log
+pnpm-debug.log
+
+# build output
+dist
+build
+.next
+coverage
+
+# environment files
+.env
+.env.*
+!.env.example
+
+# git
+.git
+.gitignore
+
+# docker
+Dockerfile
+docker-compose.yml
+
+# logs
+logs
+*.log
+
+# editor/system
+.vscode
+.idea
+.DS_Store
+
+# tests
+__tests__
+*.spec.ts
+*.test.ts
+
+# cache/temp
+.tmp
+.cache
+
+# misc
+README.md
