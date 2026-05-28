@@ -13,10 +13,10 @@ export class MessagesService {
     query: MessagesListQueryDTO,
     params: MessagesConversationIdParamsDTO
   ) {
-    const { limit, page, search } = query;
+    const { search } = query;
     const { conversationId } = params;
 
-    const messages = prisma.message.findMany({
+    return prisma.message.findMany({
       where: {
         conversationId,
         ...(search && { content: { contains: search, mode: "insensitive" } }),
@@ -25,14 +25,12 @@ export class MessagesService {
         createdAt: true,
         id: true,
         content: true,
+        role: true,
       },
       orderBy: {
-        createdAt: "desc",
+        createdAt: "asc",
       },
-      skip: (page - 1) * limit,
-      take: limit,
     });
-    return messages;
   }
 
   async send(body: MessagesSendBodyDTO, res: Response, sessionId: string) {

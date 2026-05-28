@@ -45,6 +45,14 @@ const envSchema = z.object({
   BULL_BOARD_PATH: z.string().default("/admin/queues"),
   BULL_BOARD_USER: z.string().optional(),
   BULL_BOARD_PASSWORD: z.string().optional(),
+
+  NEXTAUTH_SECRET: z.string(),
+  ADMIN_EMAIL: z.email(),
+
+  // Cloudinary
+  CLOUDINARY_CLOUD_NAME: z.string().min(1, "CLOUDINARY_CLOUD_NAME is required"),
+  CLOUDINARY_API_KEY: z.string().min(1, "CLOUDINARY_API_KEY is required"),
+  CLOUDINARY_API_SECRET: z.string().min(1, "CLOUDINARY_API_SECRET is required"),
 });
 
 const parsed = envSchema.safeParse(process.env);

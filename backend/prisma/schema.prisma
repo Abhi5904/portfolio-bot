@@ -1,9 +1,11 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
 }
 
 datasource db {
-  provider = "postgresql"
+  provider   = "postgresql"
+  extensions = [pgvector(map: "vector")]
 }
 
 model VisitorSession {
@@ -40,7 +42,69 @@ model Message {
   @@map("messages")
 }
 
+model Document {
+  id                 String          @id @default(uuid())
+  title              String
+  description        String?
+  fileUrl            String          @map("file_url")
+  cloudinaryPublicId String?         @map("cloudinary_public_id")
+  fileType           DocumentType    @map("file_type")
+  mimeType           String          @map("mime_type")
+  fileSize           Int             @map("file_size") // bytes
+  status             DocumentStatus  @default(PENDING)
+  currentStep        PipelineStep?   @map("current_step")
+  errorMessage       String?         @map("error_message")
+  chunkSize          Int             @default(500) @map("chunk_size")
+  chunkOverlap       Int             @default(50) @map("chunk_overlap")
+  createdAt          DateTime        @default(now()) @map("created_at")
+  updatedAt          DateTime        @updatedAt @map("updated_at")
+  chunks             DocumentChunk[]
+
+  @@map("documents")
+}
+
+model DocumentChunk {
+  id         String                      @id @default(uuid())
+  documentId String                      @map("document_id")
+  content    String // raw text of the chunk
+  chunkIndex Int                         @map("chunk_index") // ordering within the document
+  tokenCount Int?                        @map("token_count")
+  pageNumber Int?                        @map("page_number") // for PDFs / paginated docs
+  metadata   Json? // any extra parser metadata
+  embedding  Unsupported("vector(768)")?
+  createdAt  DateTime                    @default(now()) @map("created_at")
+  document   Document                    @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([documentId, chunkIndex])
+  @@map("document_chunks")
+}
+
 enum MessageRole {
   USER
   ASSISTANT
+}
+
+enum DocumentStatus {
+  PENDING // uploaded, job not yet picked up
+  PROCESSING // worker is actively running the pipeline
+  DONE // all steps completed, vectors stored
+  FAILED // pipeline errored out
+}
+
+enum DocumentType {
+  PDF
+  DOCX
+  TXT
+  MD
+}
+
+enum PipelineStep {
+  UPLOADED // file saved to Cloudinary + DB record created
+  FETCHING // worker fetching file bytes from Cloudinary
+  PARSING // extracting raw text from the file
+  CHUNKING // splitting text into chunks
+  EMBEDDING // converting chunks to vectors via nomic-embed-text
+  STORING // writing vectors + chunks to DB
+  COMPLETED
+  FAILED
 }

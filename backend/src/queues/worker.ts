@@ -1,44 +1,10 @@
-import { Worker, type Processor } from "bullmq";
+import type { Worker } from "bullmq";
 import { logger } from "@/shared";
 import { bullConnection } from "./connection";
+import { register as registerKnowledgeBase } from "@/modules/knowledge-base";
 
-/**
- * Single worker process — every worker is defined here.
- *
- * Run with `npm run worker:dev` (watch) or `npm run worker` (built).
- * To add a worker: `registerWorker(QUEUE_NAMES.X, async (job) => { ... })`,
- * branching on `job.name` (compared against `JOB_NAMES.X.*`) when a queue
- * carries more than one job type.
- */
-function registerWorker<TData, TResult = unknown>(
-  name: string,
-  processor: Processor<TData, TResult>
-): Worker<TData, TResult> {
-  const worker = new Worker<TData, TResult>(name, processor, {
-    connection: bullConnection,
-  });
-
-  worker.on("completed", (job) =>
-    logger.info(`[worker:${name}] job ${job.id} completed`)
-  );
-  worker.on("failed", (job, err) =>
-    logger.error(`[worker:${name}] job ${job?.id ?? "?"} failed`, err.message)
-  );
-  worker.on("error", (err) =>
-    logger.error(`[worker:${name}] error`, err.message)
-  );
-
-  return worker;
-}
-
-// ─── Register all workers here ────────────────────────────────────────────────
-const workers: Worker[] = [
-  // registerWorker(QUEUE_NAMES.EMAIL, async (job) => {
-  //   switch (job.name) {
-  //     case JOB_NAMES.EMAIL.WELCOME: return sendWelcome(job.data);
-  //   }
-  // }),
-];
+// ─── Register all workers ─────────────────────────────────────────────────────
+const workers: Worker[] = [registerKnowledgeBase()];
 
 logger.info(`🛠  Worker process started — ${workers.length} worker(s) active`);
 

@@ -11,7 +11,7 @@ export class ConversationsController {
   constructor(private conversationsService: ConversationsService) {}
 
   list = asyncHandler(async (req: ListRequest, res: Response) => {
-    const result = await this.conversationsService.list(req.validated.query);
+    const result = await this.conversationsService.list(req.validated.query, req.sessionId!);
     res.json({ success: true, data: result });
   });
 }

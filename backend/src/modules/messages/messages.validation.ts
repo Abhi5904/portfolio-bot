@@ -10,16 +10,16 @@ export class MessagesValidation extends BaseValidator {
 
   list = {
     params: this.conversationIdParams,
-    query: this.paginationQuery().extend({
-      search: z.string().optional(),
-    }),
+    query: this.validateQuery(
+      z.object({
+        search: z.string().optional(),
+      })
+    ),
   };
 
   send = {
     body: this.validateBody(
       z.object({
-        // Optional: omitted when starting a brand-new conversation, in which
-        // case the service lazily creates one.
         conversationId: z.uuid().optional(),
         message: z.string().min(1),
       })

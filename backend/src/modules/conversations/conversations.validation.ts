@@ -3,8 +3,10 @@ import z from "zod";
 
 export class ConversationsValidation extends BaseValidator {
   list = {
-    query: this.paginationQuery().extend({
-      search: z.string().optional(),
-    }),
+    query: this.validateQuery(
+      z.object({
+        search: z.string().optional(),
+      })
+    ),
   };
 }

@@ -9,6 +9,7 @@ declare global {
         params: unknown;
       };
       sessionId?: string;
+      adminEmail?: string;
     }
   }
 }

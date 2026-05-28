@@ -23,7 +23,6 @@ export class MessagesController {
   });
 
   send = asyncHandler(async (req: SendRequest, res: Response) => {
-    // sessionId is guaranteed by the requireSession middleware on this route.
     await this.messagesService.send(req.validated.body, res, req.sessionId!);
   });
 }
