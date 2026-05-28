@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Caveat } from "next/font/google";
 
 import { ThemeProvider } from "@/providers/theme-provider";
+import { SessionProvider } from "@/providers/session-provider";
+import { AuthProvider } from "@/providers/auth-provider";
 import { siteConfig } from "@/config/site";
 import "./globals.css";
 
@@ -47,7 +49,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <AuthProvider>
+            <SessionProvider>{children}</SessionProvider>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

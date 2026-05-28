@@ -9,8 +9,13 @@ export const metadata: Metadata = {
 export default async function ChatPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; id?: string }>;
 }) {
-  const { q } = await searchParams;
-  return <ChatShell initialQuery={typeof q === "string" ? q : undefined} />;
+  const { q, id } = await searchParams;
+  return (
+    <ChatShell
+      initialQuery={typeof q === "string" ? q : undefined}
+      initialConversationId={typeof id === "string" ? id : undefined}
+    />
+  );
 }

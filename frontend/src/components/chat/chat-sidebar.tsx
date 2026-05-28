@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { MessageSquare, Plus } from "lucide-react";
+import { MessageSquare, Plus, Search } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { siteConfig } from "@/config/site";
@@ -13,6 +14,8 @@ interface ChatSidebarProps {
   onNewChat: () => void;
   onSelect?: (id: string) => void;
   className?: string;
+  searchQuery?: string;
+  onSearchChange?: (query: string) => void;
 }
 
 /**
@@ -25,6 +28,8 @@ export function ChatSidebar({
   onNewChat,
   onSelect,
   className,
+  searchQuery = "",
+  onSearchChange,
 }: ChatSidebarProps) {
   return (
     <aside
@@ -42,11 +47,20 @@ export function ChatSidebar({
         </Link>
       </div>
 
-      <div className="px-3 pb-2">
-        <Button variant="outline" className="w-full justify-start" onClick={onNewChat}>
+      <div className="px-3 pb-2 flex flex-col gap-2">
+        <Button variant="outline" className="w-full justify-start shrink-0" onClick={onNewChat}>
           <Plus />
           New chat
         </Button>
+        <div className="relative flex items-center shrink-0">
+          <Search className="absolute left-2.5 size-3.5 text-sidebar-foreground/50 pointer-events-none" />
+          <Input
+            placeholder="Search chats..."
+            value={searchQuery}
+            onChange={(e) => onSearchChange?.(e.target.value)}
+            className="h-8 pl-8 pr-3 text-xs bg-sidebar-accent/30 border-sidebar-border focus-visible:ring-1 focus-visible:ring-sidebar-ring"
+          />
+        </div>
       </div>
 
       <ScrollArea className="flex-1">

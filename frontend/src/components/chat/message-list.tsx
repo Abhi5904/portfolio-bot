@@ -19,12 +19,16 @@ export function MessageList({ messages, isLoading }: MessageListProps) {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isLoading]);
 
+  const showTypingIndicator =
+    isLoading &&
+    (messages.length === 0 || messages[messages.length - 1]?.role !== "assistant");
+
   return (
     <div className="flex flex-col gap-6">
       {messages.map((message) => (
         <MessageBubble key={message.id} message={message} />
       ))}
-      {isLoading && <TypingIndicator />}
+      {showTypingIndicator && <TypingIndicator />}
       <div ref={bottomRef} />
     </div>
   );
