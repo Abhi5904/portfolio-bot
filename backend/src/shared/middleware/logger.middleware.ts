@@ -8,6 +8,9 @@ export const requestLogger = (
   res: Response,
   next: NextFunction
 ): void => {
+  if (req.originalUrl.startsWith("/admin/queues")) {
+    return next();
+  }
   const start = process.hrtime.bigint();
 
   res.on("finish", () => {

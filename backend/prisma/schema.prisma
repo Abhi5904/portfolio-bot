@@ -54,8 +54,8 @@ model Document {
   status             DocumentStatus  @default(PENDING)
   currentStep        PipelineStep?   @map("current_step")
   errorMessage       String?         @map("error_message")
-  chunkSize          Int             @default(500) @map("chunk_size")
-  chunkOverlap       Int             @default(50) @map("chunk_overlap")
+  chunkSize          Int             @default(1500) @map("chunk_size")
+  chunkOverlap       Int             @default(200) @map("chunk_overlap")
   createdAt          DateTime        @default(now()) @map("created_at")
   updatedAt          DateTime        @updatedAt @map("updated_at")
   chunks             DocumentChunk[]
@@ -77,6 +77,14 @@ model DocumentChunk {
 
   @@index([documentId, chunkIndex])
   @@map("document_chunks")
+}
+
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("settings")
 }
 
 enum MessageRole {

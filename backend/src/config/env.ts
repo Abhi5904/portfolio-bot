@@ -49,6 +49,10 @@ const envSchema = z.object({
   NEXTAUTH_SECRET: z.string(),
   ADMIN_EMAIL: z.email(),
 
+  // Ollama — host the LLM/embedding server listens on. In Docker use
+  // http://host.docker.internal:11434; locally http://localhost:11434.
+  OLLAMA_BASE_URL: z.url().default("http://localhost:11434"),
+
   // Cloudinary
   CLOUDINARY_CLOUD_NAME: z.string().min(1, "CLOUDINARY_CLOUD_NAME is required"),
   CLOUDINARY_API_KEY: z.string().min(1, "CLOUDINARY_API_KEY is required"),

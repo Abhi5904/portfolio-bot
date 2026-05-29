@@ -26,6 +26,8 @@ export class CloudinaryService {
       const stream = cloudinary.uploader.upload_stream(
         {
           resource_type: "raw",
+          type: "upload",
+          access_mode: "public",
           folder: FOLDER,
           public_id: filename,
           unique_filename: true,
@@ -67,14 +69,5 @@ export class CloudinaryService {
       format: result.format ?? "",
       createdAt: result.created_at,
     };
-  }
-
-  getSignedUrl(publicId: string, expiresInSeconds = 3600): string {
-    return cloudinary.url(publicId, {
-      resource_type: "raw",
-      type: "authenticated",
-      sign_url: true,
-      expires_at: Math.floor(Date.now() / 1000) + expiresInSeconds,
-    });
   }
 }

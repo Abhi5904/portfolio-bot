@@ -44,6 +44,20 @@ export class KnowledgeBaseRoutes {
       this.controller.findById
     );
 
+    this.router.get(
+      "/:id/token",
+      requireAdmin,
+      validate(this.v.byId),
+      this.controller.getToken
+    );
+
+    this.router.post(
+      "/:id/retry",
+      requireAdmin,
+      validate(this.v.byId),
+      this.controller.retry
+    );
+
     this.router.delete(
       "/:id",
       requireAdmin,

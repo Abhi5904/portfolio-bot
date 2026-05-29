@@ -5,6 +5,7 @@ import {
   knowledgeBaseRoutes,
   messagesRoutes,
   sessionsRoutes,
+  settingsRoutes,
 } from "./container";
 
 type RouteConfig = {
@@ -17,6 +18,7 @@ type RouteConfig = {
 // (mix of requireAdmin for CRUD + requireSseToken for SSE stream)
 const PRIVATE_ROUTES: RouteConfig[] = [
   { path: "/admin/documents", router: knowledgeBaseRoutes.router },
+  { path: "/admin/settings", router: settingsRoutes.router },
 ];
 
 // Visitor-facing routes

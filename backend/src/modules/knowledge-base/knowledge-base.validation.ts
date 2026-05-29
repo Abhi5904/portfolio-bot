@@ -6,8 +6,8 @@ export class KnowledgeBaseValidation extends BaseValidator {
     body: z.object({
       title: z.string().min(1, "Title is required").max(200),
       description: z.string().max(1000).optional(),
-      chunkSize: z.coerce.number().int().min(100).max(2000).default(500),
-      chunkOverlap: z.coerce.number().int().min(0).max(500).default(50),
+      chunkSize: z.coerce.number().int().min(100).max(2000).default(1500),
+      chunkOverlap: z.coerce.number().int().min(0).max(500).default(200),
     }),
   };
 

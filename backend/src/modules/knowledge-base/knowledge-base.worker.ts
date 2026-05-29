@@ -75,7 +75,11 @@ async function process(job: Job<RagPipelineJobData>): Promise<void> {
       message: "Splitting document into chunks...",
     });
 
-    const chunks = await chunkDocuments(rawDocs, doc.chunkSize, doc.chunkOverlap);
+    const chunks = await chunkDocuments(
+      rawDocs,
+      doc.chunkSize,
+      doc.chunkOverlap
+    );
 
     // EMBEDDING ────────────────────────────────────────────────────────────────
     await updateStep(documentId, PipelineStep.EMBEDDING);

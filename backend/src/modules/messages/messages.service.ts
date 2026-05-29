@@ -6,9 +6,12 @@ import type {
 } from "./messages.type";
 import type { Response } from "express";
 import { BadRequestError } from "@/shared";
-import { ollamaProvider, toLangChainMessage } from "@/ai";
+import { ollamaProvider, retrieveContext, buildRagMessages } from "@/ai";
+import type { SettingsService } from "@/modules/settings";
 
 export class MessagesService {
+  constructor(private settingsService: SettingsService) {}
+
   async list(
     query: MessagesListQueryDTO,
     params: MessagesConversationIdParamsDTO
@@ -64,9 +67,14 @@ export class MessagesService {
       take: 10,
     });
 
-    const aiMessages = history.map((m) =>
-      toLangChainMessage({ role: m.role, content: m.content })
-    );
+    // RAG retrieval: embed the question, pull relevant chunks, and build a
+    // grounded prompt (system prompt + context) ahead of the conversation.
+    const [retrieved, systemPrompt] = await Promise.all([
+      retrieveContext(message),
+      this.settingsService.resolveSystemPrompt(),
+    ]);
+
+    const aiMessages = buildRagMessages(systemPrompt, retrieved, history);
 
     // Set SSE headers
     res.setHeader("Content-Type", "text/event-stream");

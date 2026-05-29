@@ -27,10 +27,16 @@ const PG_STORE_CONFIG = {
     metadataColumnName: "metadata",
   },
   distanceStrategy: "cosine" as DistanceStrategy,
+  // Return normalized similarity (0–1, higher = more similar) from
+  // similaritySearchWithScore instead of the raw cosine distance.
+  scoreNormalization: "similarity" as const,
 };
 
 function buildEmbedder(): OllamaEmbeddings {
-  return new OllamaEmbeddings({ model: MODELS.OLLAMA_EMBED });
+  return new OllamaEmbeddings({
+    baseUrl: env.OLLAMA_BASE_URL,
+    model: MODELS.OLLAMA_EMBED,
+  });
 }
 
 /**
@@ -111,8 +117,9 @@ export async function similaritySearch(
 }
 
 /**
- * Similarity search with relevance scores (0–1, higher = more similar).
- * Useful when callers need to threshold results by confidence.
+ * Similarity search with normalized relevance scores. Because the store is
+ * configured with scoreNormalization "similarity", each score is in [0, 1]
+ * where higher means more similar — callers can threshold by confidence.
  */
 export async function similaritySearchWithScore(
   query: string,

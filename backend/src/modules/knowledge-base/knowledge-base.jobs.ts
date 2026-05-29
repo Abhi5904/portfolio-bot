@@ -17,9 +17,20 @@ export type RagPipelineJobData = {
 };
 
 export async function enqueueRagPipeline(documentId: string): Promise<void> {
-  await queues[QUEUE_NAMES.RAG_PIPELINE].add(
+  const queue = queues[QUEUE_NAMES.RAG_PIPELINE];
+
+  // Clean up any existing job with the same ID (failed, completed, or active)
+  const existingJob = await queue.getJob(documentId);
+  if (existingJob) {
+    await existingJob.remove();
+  }
+
+  await queue.add(
     JOB_NAMES.PROCESS,
     { documentId },
-    JOB_OPTIONS
+    {
+      ...JOB_OPTIONS,
+      jobId: documentId,
+    }
   );
 }

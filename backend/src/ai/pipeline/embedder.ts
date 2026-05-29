@@ -1,6 +1,8 @@
 import { OllamaEmbeddings } from "@langchain/ollama";
 import type { Document } from "@langchain/core/documents";
 
+import { env } from "@/config";
+
 import { MODELS } from "../ai.constants";
 
 const BATCH_SIZE = 10;
@@ -13,7 +15,10 @@ const BATCH_SIZE = 10;
  * order.
  */
 export async function embedDocuments(docs: Document[]): Promise<number[][]> {
-  const embedder = new OllamaEmbeddings({ model: MODELS.OLLAMA_EMBED });
+  const embedder = new OllamaEmbeddings({
+    baseUrl: env.OLLAMA_BASE_URL,
+    model: MODELS.OLLAMA_EMBED,
+  });
   const texts = docs.map((d) => d.pageContent);
   const allVectors: number[][] = [];
 

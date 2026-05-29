@@ -42,6 +42,18 @@ export class KnowledgeBaseController {
     return successResponse(res, "Document fetched", result);
   });
 
+  getToken = asyncHandler(async (req: ByIdRequest, res: Response) => {
+    const { id } = req.validated.params;
+    const result = await this.service.getToken(id);
+    return successResponse(res, "Token generated", result);
+  });
+
+  retry = asyncHandler(async (req: ByIdRequest, res: Response) => {
+    const { id } = req.validated.params;
+    const result = await this.service.retry(id);
+    return successResponse(res, "Pipeline restarted", result);
+  });
+
   delete = asyncHandler(async (req: ByIdRequest, res: Response) => {
     const { id } = req.validated.params as { id: string };
     await this.service.delete(id);

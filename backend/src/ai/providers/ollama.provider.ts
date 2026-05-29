@@ -5,6 +5,7 @@ import {
 } from "@langchain/core/messages";
 import { ChatOllama } from "@langchain/ollama";
 
+import { env } from "@/config";
 import { logger } from "@/shared";
 import { InternalServerError } from "@/shared/utils/app-error";
 
@@ -17,6 +18,7 @@ export class OllamaProvider {
 
   constructor() {
     this.client = new ChatOllama({
+      baseUrl: env.OLLAMA_BASE_URL,
       model: MODELS.OLLAMA,
       maxRetries: 2,
       temperature: AI_DEFAULTS.TEMPERATURE,
@@ -53,6 +55,7 @@ export class OllamaProvider {
       this.logCompletion(usage, responseMetadata);
       yield { delta: "", done: true };
     } catch (error) {
+      console.log(error);
       logger.error(
         "Ollama stream request failed",
         error instanceof Error ? error.message : String(error)

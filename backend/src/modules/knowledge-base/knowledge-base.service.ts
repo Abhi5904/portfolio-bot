@@ -93,6 +93,50 @@ export class KnowledgeBaseService {
     return doc;
   }
 
+  async getToken(id: string): Promise<{ sseToken: string }> {
+    const doc = await prisma.document.findUnique({
+      where: { id },
+      select: { id: true },
+    });
+    if (!doc) throw new NotFoundError("Document not found");
+
+    const sseToken = await signSseToken(id);
+    return { sseToken };
+  }
+
+  async retry(id: string): Promise<{ documentId: string; sseToken: string }> {
+    const doc = await prisma.document.findUnique({
+      where: { id },
+    });
+    if (!doc) throw new NotFoundError("Document not found");
+    if (doc.status !== "FAILED") {
+      throw new Error("Only failed pipeline jobs can be retried");
+    }
+
+    // 1. Clean up database chunks
+    await prisma.documentChunk.deleteMany({
+      where: { documentId: id },
+    });
+
+    // 2. Reset document record status to PENDING
+    await prisma.document.update({
+      where: { id },
+      data: {
+        status: "PENDING",
+        currentStep: "UPLOADED",
+        errorMessage: null,
+      },
+    });
+
+    // 3. Enqueue the pipeline job again (cleans up any existing job automatically)
+    await enqueueRagPipeline(id);
+
+    // 5. Generate a new SSE token
+    const sseToken = await signSseToken(id);
+
+    return { documentId: id, sseToken };
+  }
+
   async stream(req: Request, res: Response, id: string, token: string): Promise<void> {
     let documentId: string;
     try {
@@ -141,14 +185,23 @@ export class KnowledgeBaseService {
     }
 
     const channel = RAG_PIPELINE_CHANNEL(documentId);
+    let cleaned = false;
     const cleanup = await redisPubSub.subscribe<{ done?: boolean }>(channel, (event) => {
       send(event);
       if (event.done) {
-        void cleanup().then(() => res.end());
+        if (!cleaned) {
+          cleaned = true;
+          void cleanup().then(() => res.end());
+        }
       }
     });
 
-    req.on("close", () => void cleanup());
+    req.on("close", () => {
+      if (!cleaned) {
+        cleaned = true;
+        void cleanup();
+      }
+    });
   }
 
   async delete(id: string): Promise<void> {
