@@ -1,17 +1,23 @@
 version: "3.9"
 
+# ─── Shared config applied to all app services via YAML anchor ───────────────
 x-app: &app
-  build: .
+  build:
+    context: .
+    dockerfile: Dockerfile
   image: portfolio-bot-backend
   env_file:
     - .env
 
+# ─── Services ─────────────────────────────────────────────────────────────────
 services:
 
+  # One-shot migration runner — exits after applying pending Prisma migrations.
+  # api and worker wait for this to complete successfully before starting.
   migrate:
     <<: *app
-    command: npm run prisma:migrate:deploy
     container_name: migrate
+    command: npm run prisma:migrate:deploy
     depends_on:
       postgres:
         condition: service_healthy
@@ -38,6 +44,7 @@ services:
       migrate:
         condition: service_completed_successfully
 
+  # ── Backing services ──────────────────────────────────────────────────────
   postgres:
     image: pgvector/pgvector:pg17
     container_name: postgres
@@ -54,7 +61,7 @@ services:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 5s
       timeout: 5s
-      retries: 5  
+      retries: 5
 
   redis:
     image: redis:8-alpine

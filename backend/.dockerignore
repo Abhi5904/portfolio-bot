@@ -1,45 +1,45 @@
-# dependencies
+# ── Node dependencies (reinstalled inside the image) ──────────────────────
 node_modules
 npm-debug.log
 yarn-error.log
 pnpm-debug.log
 
-# build output
+# ── Build output (rebuilt inside the image) ───────────────────────────────
 dist
 build
-.next
 coverage
 
-# environment files
+# ── Environment files (injected at runtime via env_file / -e) ─────────────
 .env
 .env.*
 !.env.example
 
-# git
+# ── Git metadata ───────────────────────────────────────────────────────────
 .git
 .gitignore
 
-# docker
+# ── Docker files (don't copy into the image they're building) ─────────────
 Dockerfile
-docker-compose.yml
+docker-compose*.yml
 
-# logs
+# ── Logs ───────────────────────────────────────────────────────────────────
 logs
 *.log
 
-# editor/system
+# ── Editor / OS artefacts ──────────────────────────────────────────────────
 .vscode
 .idea
 .DS_Store
+*.swp
 
-# tests
+# ── Tests ──────────────────────────────────────────────────────────────────
 __tests__
 *.spec.ts
 *.test.ts
 
-# cache/temp
+# ── Cache / temp ───────────────────────────────────────────────────────────
 .tmp
 .cache
 
-# misc
-README.md
+# ── Docs ───────────────────────────────────────────────────────────────────
+*.md

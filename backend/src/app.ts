@@ -20,7 +20,14 @@ export class App {
 
   initializeMiddlewares() {
     this.app.use(
-      cors({ origin: env.CORS_ORIGIN, credentials: env.CORS_CREDENTIALS })
+      cors({
+        // CORS_ORIGIN accepts "*" (wildcard) or a comma-separated list of allowed
+        // origins, e.g. "http://localhost:3000,https://your-app.vercel.app"
+        // Set credentials: true only when CORS_ORIGIN is NOT "*" — browsers
+        // reject credentialed requests to a wildcard origin.
+        origin: env.CORS_ORIGIN,
+        credentials: env.CORS_CREDENTIALS,
+      })
     );
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));

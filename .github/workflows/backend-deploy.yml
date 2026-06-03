@@ -1,0 +1,48 @@
+name: Backend Deploy
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      # Only run when something inside backend/ actually changed
+      - "backend/**"
+
+jobs:
+  deploy:
+    name: Deploy to EC2
+    runs-on: ubuntu-latest
+
+    steps:
+      # ── 1. Checkout (needed so git knows what changed; not strictly required
+      #         for the SSH deploy but good practice to keep the action honest)
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── 2. SSH into EC2, pull latest code, rebuild & restart containers
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          # Each line below is a separate command executed on the remote host.
+          # Failures are surfaced back to GitHub Actions as a non-zero exit.
+          script: |
+            set -e
+
+            # Pull the latest commits from main
+            cd ~/portfolio-bot
+            git pull origin main
+
+            # Navigate to the backend folder
+            cd backend
+
+            # Tear down running containers (volumes are preserved)
+            docker compose -f docker-compose.yml -f docker-compose.prod.yml down
+
+            # Rebuild image and start all services in the background
+            docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+
+            # Quick sanity check — show what's running
+            docker compose -f docker-compose.yml -f docker-compose.prod.yml ps

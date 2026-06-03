@@ -1,0 +1,48 @@
+name: Frontend Deploy
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      # Only run when something inside frontend/ actually changed
+      - "frontend/**"
+
+jobs:
+  deploy:
+    name: Deploy to Vercel
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── Install the Vercel CLI so we can drive the deployment
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      # ── Pull Vercel project settings (vercel.json, env vars, etc.)
+      #    --yes accepts all prompts non-interactively
+      - name: Pull Vercel environment
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+        working-directory: frontend
+
+      # ── Build the Next.js app using Vercel's build pipeline
+      - name: Build project
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+        working-directory: frontend
+
+      # ── Push the pre-built output to Vercel
+      - name: Deploy to Vercel
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+        working-directory: frontend
+
+# ── Required GitHub Secrets ──────────────────────────────────────────────────
+# VERCEL_TOKEN       — Vercel personal access token (vercel.com → Settings → Tokens)
+# VERCEL_ORG_ID      — found in your Vercel project settings  (set as env var below
+#                      if needed; the CLI picks it up from .vercel/project.json after pull)
+# VERCEL_PROJECT_ID  — same as above
+#
+# Environment variables (NEXT_PUBLIC_API_URL etc.) should be configured directly
+# in the Vercel dashboard under Project → Settings → Environment Variables so they
+# are baked into the build. Do NOT store them as GitHub secrets for this workflow.

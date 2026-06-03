@@ -1,8 +1,13 @@
 services:
   api:
     command: node dist/server.js
+    restart: always
     ports:
-      - "8000:8000"
+      - "80:8000"   # EC2 port 80 → container port 8000
 
   worker:
     command: node dist/queues/worker.js
+    restart: always
+
+  migrate:
+    restart: "no"   # one-shot — don't restart after it completes
